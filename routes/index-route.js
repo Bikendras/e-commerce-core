@@ -36,7 +36,8 @@ router.post("/user/myaddCardApi/:email",upload?.single(),indexController.myAddCa
 router.get("/user/mygetCardApi/:email",upload?.single(),indexController.mygetCartApi) // Get cart data Successfully
 router.post("/user/cardremove/:id",upload?.single(),indexController.cartRemoveApi) // Remove cart Successfully
 router.post("/MarchantProductInsert/:email",upload?.single(),verify, indexController.marchentOrderApi) // Merchant Added cart Data Successfully
-router.get("/MarchantProduct/:email",verify, indexController.merchantgetApi) // Merchant get cart data Successfully
+router.get("/MarchantProductget/:email",verify, indexController.merchantgetApi) // Merchant get cart data Successfully
+router.post("/productdelete/:id",upload?.single(), indexController.merchantDataDeleteAPI) // Merchant delete cart data Successfully
 module.exports=router;
 
 

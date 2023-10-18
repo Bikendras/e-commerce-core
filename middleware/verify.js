@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const verify = async (req, res, next) => {
-    console.log("req in verify", req);  // Use 'req.headers.authorization' instead of 'res.Authorization'
+    // console.log("req in verify", req);  // Use 'req.headers.authorization' instead of 'res.Authorization'
 
     const token = req.headers.authorization;  // Use 'req.headers.authorization' instead of 'req.headers.Authorization'
-    console.log("token in verify", token);
+    // console.log("token in verify", token);
     
     if (token) {
         jwt.verify(token, "private_key", function(err, decoded) {  // Use 'decoded' instead of 'decode'

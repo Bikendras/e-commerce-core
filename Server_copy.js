@@ -26,15 +26,12 @@ app.post("/redirect", function (req, res) {
 
 app.post("/register", upload.single(), async function (req, res) {
     const { name, email, password, confirm_password } = req.body;
-    // console.log("name,email,password,confirm_password", name, email, password, confirm_password);
     if (name && email && password && confirm_password) {
         if (password == confirm_password) {
             var users = await dbConnect();
             // const saltRounds=10;
             // const salt = bcrypt.genSaltSync(saltRounds);
             const hashpassword = await bcrypt.hash(password, 10);
-            console.log("hashpassword", hashpassword);
-
             var findUser = await users.findOne({ email: email });
             if (findUser) {
                 res.send({ message: "User Already Registered", status: 1 });
@@ -73,7 +70,6 @@ app.post("/login", upload.single(), async function (request, response) {
     else if (email && password) {
         const users = await dbConnect();
         const usersdata = await users.findOne({ email: email });
-        console.log("usersdata", usersdata);
         if (usersdata) {
             if (usersdata.email == email) {
                 bcrypt.compare(password, usersdata.password, function (err, result) {
@@ -95,7 +91,6 @@ app.post("/login", upload.single(), async function (request, response) {
     });
 
 // app.post("/login", upload.single(),async function (request, response) {
-//     // console.log("request data", request.body);
 //     // var email = request.body.email;
 //     // var password = request.body.password;
 //     var { email, password } = request.body;
@@ -106,7 +101,6 @@ app.post("/login", upload.single(), async function (request, response) {
 //      else if (email && password) {
 //         const users =await dbConnect();
 //         const usersdata= await users.findOne();
-//         console.log("usersdata",usersdata);
 //         if(usersdata.email==email && usersdata.password==password){
 //             response.send({ message: "login Successfully", status: 1 });
 //         }
@@ -244,7 +238,6 @@ app.post("/enableUser/:email", upload.single(), async function (req, res) {
 // hard delete data..
 app.post("/delete/:email", upload.single(), async function (request, response) {
     const email = request.params.email;
-    console.log("status,email", email);
     if (email) {
         const user = await dbConnect();
         const findUser = await user.findOne({ email: email });

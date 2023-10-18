@@ -13,7 +13,6 @@ app.use("/", indexRoute);
 
 
 // app.post("/login", upload.single(),async function (request, response) {
-//     // console.log("request data", request.body);
 //     // var email = request.body.email;
 //     // var password = request.body.password;
 //     var { email, password } = request.body;
@@ -24,7 +23,6 @@ app.use("/", indexRoute);
 //      else if (email && password) {
 //         const users =await dbConnect();
 //         const usersdata= await users.findOne();
-//         console.log("usersdata",usersdata);
 //         if(usersdata.email==email && usersdata.password==password){
 //             response.send({ message: "login Successfully", status: 1 });
 //         }

@@ -60,7 +60,6 @@ const loginApi = async function (req, res) {
     else if (email && password ) {
         const users = await dbConnect();
         const usersdata = await users.findOne({ email: email });
-        console.log("usersdata", usersdata);
         if (usersdata) {
             if (usersdata.email == email) {
                 bcrypt.compare(password, usersdata.password, async function (err, result) {
@@ -205,7 +204,6 @@ const enableUserApi = async function (req, res) {
 // User Delete Api...
 const deleteApi = async function (request, response) {
     const email = request.params.email;
-    console.log("status,email", email);
     if (email) {
         const user = await dbConnect();
         const findUser = await user.findOne({ email: email });
@@ -293,7 +291,6 @@ const OrderBookedApi = async function (req, res) {
                       pass: "voxy cdyv aatl hkjb" // original gmail ke 2 way verification password hai..
                     }
                   });
-                  console.log("transport",transport);
                   const info = await transport.sendMail({
                     from: email, // sender address
                     to: "bikendra7848@gmail.com", // list of receivers Reac
@@ -301,7 +298,6 @@ const OrderBookedApi = async function (req, res) {
                     text: `Congratulation dear user, ${email} your order booked successfully`, // plain text body
                     html: `<b>Congratulation dear user, ${email} your order booked successfully</b>`, // html body send to customer message.
                   });
-                  console.log("message send: %s",info.messageId);
                 res.send({ message: "order placed successfully", status: 1 });
             }
             else {
@@ -386,16 +382,11 @@ const mygetCartApi = async (req, res) => {
 // Remove cart Successfully
 const cartRemoveApi = async (req,res)=>{
     const {id} = req.params;
-    console.log("id", id)
     const email = req.body.email;
     const card = await dbConnect("cart");
-    console.log("email", email, req.body.email)
     const findUser = await card.findOne({email:email});
-    console.log("find", findUser)
     if(findUser){
-        console.log("finsssd")
         const deleteUser = await card.deleteOne({ _id: new ObjectId(id) });
-        console.log("deleteUser", deleteUser);
         if(deleteUser){
             res.send({message: "Delete user data", status: 1 });
         }
@@ -409,7 +400,7 @@ const cartRemoveApi = async (req,res)=>{
 // Added Merchant data Successfully
 const marchentOrderApi = async (req, res) => {
     const {email} = req.params;
-    const {productname,productPrice} = req.body;
+    const {productname,productPrice,discount,totalprice} = req.body;
     if(email){
         if(email != "" && email != "undefined" && email != "null"){
             const order = await dbConnect("merchant");
@@ -417,6 +408,8 @@ const marchentOrderApi = async (req, res) => {
                 email: email,
                 productname: productname,
                 productPrice: productPrice,
+                discount: discount,
+                // totalprice: totalprice,
             });
             if(insertdata){
                 res.send({message: "Data inserted successfully", status: 1, data: insertdata});
@@ -432,17 +425,37 @@ const marchentOrderApi = async (req, res) => {
 // Get Merchant data Successfully
 const merchantgetApi = async(req,res)=>{
     const {email} = req.params;
-    console.log("email",email);
-    const merchantOrders = await dbConnect("merchant");
-    console.log("merchantOrders",merchantOrders);
-    const myorderProductGet = await merchantOrders.find({email}).toArray();
-    console.log("myorderProductGet",myorderProductGet);
-    if(myorderProductGet){
-        res.send({message: "self Product Fetched" , status: 1 , merchantProduct: myorderProductGet});
+    if(email != "null" && email != "undefined" && email != ""){
+        const merchantOrders = await dbConnect("merchant");
+        const myorderProductGet = await merchantOrders.find({email:email}).toArray();
+        console.log("myorderProductGet",myorderProductGet);
+        if(myorderProductGet){
+            res.send({message: "self Product Fetched " , status: 1 , merchantProd: myorderProductGet});
+        }else{
+            res.send({message: "MyOrder Product Detail is not Fetched", status: 0});
+        }
     }else{
-        res.send({message: "MyOrder Product Detail is not Fetched", status: 0});
+        res.send ({message: "plz enter Valid Email", status: 0});
     }
 };
+
+const merchantDataDeleteAPI = async (req,res)=>{
+    const {id} = req.params;
+    const email = req.body.email;
+    const card = await dbConnect('merchant')
+    const findUser = await card.findOne({email: email});
+    if(findUser){
+        const deleteUser = await card.deleteOne({_id: new ObjectId(id)});
+        if(deleteUser){
+            res.send({message: 'Delete Merchant data', status: 1});
+        }else{
+            res.send({message: 'User data not Deleted', status: 0});
+        }
+    }else{
+        res.send({message: 'Merchant email not found', status: 0});
+    }
+};
+
 
 module.exports = { 
                     rootApi, 
@@ -462,6 +475,7 @@ module.exports = {
                     cartRemoveApi,
                     marchentOrderApi,
                     merchantgetApi,
+                    merchantDataDeleteAPI,
                 };
 
 
