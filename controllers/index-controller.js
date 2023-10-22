@@ -441,6 +441,7 @@ const merchantgetApi = async(req,res)=>{
 
 const merchantDataDeleteAPI = async (req,res)=>{
     const {id} = req.params;
+    console.log("id",id);
     const email = req.body.email;
     const card = await dbConnect('merchant')
     const findUser = await card.findOne({email: email});
