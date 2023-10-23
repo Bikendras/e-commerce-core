@@ -95,7 +95,6 @@ const alluserApi = async function (req, res) {
 }
 // Profile Update Api...
 const updateApi = async function (req, res) {
-    const { firstname, lastname, mobile, password } = req.body;
     const email = req.params.email;
     const name = req.body.name;
     const address = req.body.address;
@@ -400,7 +399,7 @@ const cartRemoveApi = async (req,res)=>{
 // Added Merchant data Successfully
 const marchentOrderApi = async (req, res) => {
     const {email} = req.params;
-    const {productname,productPrice,discount,totalprice} = req.body;
+    const {productname,productPrice,discount} = req.body;
     if(email){
         if(email != "" && email != "undefined" && email != "null"){
             const order = await dbConnect("merchant");
@@ -409,7 +408,6 @@ const marchentOrderApi = async (req, res) => {
                 productname: productname,
                 productPrice: productPrice,
                 discount: discount,
-                // totalprice: totalprice,
             });
             if(insertdata){
                 res.send({message: "Data inserted successfully", status: 1, data: insertdata});
@@ -457,6 +455,34 @@ const merchantDataDeleteAPI = async (req,res)=>{
     }
 };
 
+const merchantDataUpdateAPI = async (req, res)=>{
+    const {id} = req.params;
+    const {email,productname,productPrice,discount} = req.body;
+    if(id){
+        if(id !== undefined && id !== null){
+            const user = await dbConnect();
+            const findUser = await user.findOne({_id: new ObjectId(id)});
+            if(findUser){
+                const UpdateData = await user.updateOne({_id:id},{$set:{
+                    // email: email,
+                    productname: productname,
+                    productPrice: productPrice,
+                    discount: discount
+                }});
+                if(UpdateData){
+                    res.send({message: "Product Details updated successfully", status: 1});
+                }else{
+                    res.send({message: "Product Details is not updated", status: 0});
+                }
+            }else{
+                res.send({message: "User email is not Found", status: 0});
+            }
+        }else{
+            res.send({message: "please enter your email address", status: 0});
+        }
+    }
+}
+
 module.exports = { 
                     rootApi, 
                     registerApi, 
@@ -476,6 +502,7 @@ module.exports = {
                     marchentOrderApi,
                     merchantgetApi,
                     merchantDataDeleteAPI,
+                    merchantDataUpdateAPI,
                 };
 
 
