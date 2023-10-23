@@ -457,7 +457,6 @@ const merchantDataDeleteAPI = async (req,res)=>{
     }
 };
 
-
 module.exports = { 
                     rootApi, 
                     registerApi, 
