@@ -1,6 +1,6 @@
 const dbConnect = require("../dbConfig/config");
 var bcrypt = require("bcrypt");
-const e = require("express");
+const express = require("express");
 var jwt = require("jsonwebtoken");
 const nodemailer=require("nodemailer");
 const {  ObjectId } = require("mongodb");
