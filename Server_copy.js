@@ -1,6 +1,8 @@
 
 var express = require("express");
 var app = express();
+const cors=require('cors');
+app.use(cors());
 var multer = require("multer");
 var upload = multer();
 var bcrypt = require("bcrypt");

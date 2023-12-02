@@ -390,7 +390,7 @@ const cartRemoveApi = async (req,res)=>{
             res.send({message: "Delete user data", status: 1 });
         }
         else{
-            res.send({message: "Not Delete user data", status: 0 });
+            res.send({message: "Not Delete user data", status: 0 });  
         }
     }else{
         res.send({message: "User email not found", status: 0 });
@@ -399,7 +399,9 @@ const cartRemoveApi = async (req,res)=>{
 // Added Merchant data Successfully
 const marchentOrderApi = async (req, res) => {
     const {email} = req.params;
-    const {productname,productPrice,discount} = req.body;
+    const {productname,productPrice,discount
+        // ,image
+    } = req.body;
     if(email){
         if(email != "" && email != "undefined" && email != "null"){
             const order = await dbConnect("merchant");
@@ -408,6 +410,7 @@ const marchentOrderApi = async (req, res) => {
                 productname: productname,
                 productPrice: productPrice,
                 discount: discount,
+                // image: image,
             });
             if(insertdata){
                 res.send({message: "Data inserted successfully", status: 1, data: insertdata});
