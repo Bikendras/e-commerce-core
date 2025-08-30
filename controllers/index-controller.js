@@ -3,7 +3,7 @@ var bcrypt = require("bcrypt");
 const express = require("express");
 var jwt = require("jsonwebtoken");
 const nodemailer=require("nodemailer");
-const {  ObjectId } = require("mongodb");
+const { ObjectId } = require("mongodb");
 
 
 const rootApi = async (req, res) => {
@@ -65,12 +65,11 @@ const loginApi = async function (req, res) {
                 bcrypt.compare(password, usersdata.password, async function (err, result) {
                     if (result) {
                         const token = jwt.sign({ email: usersdata.email }, "private_key", { expiresIn: "1day", algorithm: "HS256" });
-                        console.log("token", token);
                         const userupdate = await users.updateOne({ email }, { $set: { token: token } });
                         res.send({ message: "login Successfully", status: 1, token: token, email: email, data: userupdate });
                     }
                     else {
-                        res.send({ message: "plz enter valid email && password", status: 0 });
+                        res.send({ message: "plz enter valid password", status: 0 });
                     }
                 });
             } else {
@@ -240,12 +239,11 @@ const imageUpload = async (req, res) => {
     const email = req.params.email;
     const image = req.file.originalname;
     if (email && req.file) {
-        const user = await dbConnect();
+        const user = await dbConnect('Users');
         const userFind = await user.findOne({ email: email });
         if (userFind) {
-            const userUpdate = await user.updateOne(
-                { email},
-                { $set: { image: image} }); // according to frontend request it upload the original of image to the server/backend ...
+            const userUpdate = await user.insertOne(
+                 { email: email,image: image}); // according to frontend request it upload the original of image to the server/backend ...
             if (userUpdate) {
                 res.send({ message: "User image uploade Successfully", status: 1, data: userUpdate });
             }
@@ -258,7 +256,20 @@ const imageUpload = async (req, res) => {
         }
     }
     else {
-        res.send({ message: "plz Enter your valid email", status: 0 });
+        res.send({ message: "plz Enter your valid email", status: 0 }); 
+    }
+}
+
+const getImageApi = async (req, res) => {
+    const email = req.params.email;
+    if(email){
+        const user = await dbConnect('Users');
+        const findUser = await user.find({ email: email }).toArray();
+        if(findUser){
+            res.send({ message: "Image fetched", data: findUser, status: 1 });
+        }
+    }else{
+        res.send({ message: "email is not found" , status: 0 });
     }
 }
 
@@ -285,7 +296,6 @@ const OrderBookedApi = async function (req, res) {
                     host: "smtp.gmail.com", // provider or host name
                     port: 465,
                     auth: {
-                      // TODO: replace `user` and `pass` values from <https://forwardemail.net>
                       user: email, // sender address
                       pass: "voxy cdyv aatl hkjb" // original gmail ke 2 way verification password hai..
                     }
@@ -486,6 +496,37 @@ const merchantDataUpdateAPI = async (req, res)=>{
     }
 }
 
+const generatePdf = async(req, res) => {
+    try{
+        const browser = await puppeteer.launch({headless: true});
+        const page = await browser.newPage();
+        await page.goto(`${req.protocal}://${req.get('host')}`+`/getForm${email}`,{
+            // waitantil jab tak data get nhi ho jata UI me tab tak wait karta hai...
+            waitUntil: 'networkidle2' 
+        });
+        await page.setViewport({width: 1680, height: 1050})
+        const todayDate = new Date();
+        const pdfn = await page.pdf({
+            path: `${path.join(__dirname, '../public/files', todayDate.getTime()+".pdf")}`,printBackground: true, format: "A4"
+        });
+        await browser.close();
+        const pdfURL =  path.join(__dirname, '../public/files', todayDate.getTime()+".pdf");
+
+        // res.set({
+        //     "content-Type": "application/pdf",
+        //     "Content-Length":pdfn.length
+        // });
+        // res.sendFile(pdfURL);
+        res.download(pdfURL, function(error){
+            if (error) {
+                console.log(error);
+            }
+        });
+    }catch{
+        console.log(error.message);
+    }
+}
+
 module.exports = { 
                     rootApi, 
                     registerApi, 
@@ -496,7 +537,8 @@ module.exports = {
                     enableUserApi, 
                     deleteApi, 
                     specificUserApi, 
-                    imageUpload, 
+                    imageUpload,
+                    getImageApi, 
                     OrderBookedApi, 
                     orderDetailApi,
                     myAddCartApi,
@@ -506,6 +548,7 @@ module.exports = {
                     merchantgetApi,
                     merchantDataDeleteAPI,
                     merchantDataUpdateAPI,
+                    generatePdf,
                 };
 
 
